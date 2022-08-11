@@ -15,17 +15,30 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
 <body>
 <div id="wrapper">
   <a href="index.xqy"><img src="images/logo.gif" width="427" height="76" /></a><br />
-  <span class="currently">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Currently in database: {fn:count(/wl:leader)} {co:in-office()}</span><br />
+  <span class="currently">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Currently in database:  {fn:count(/wl:leader)} {co:in-office()}</span><br />
   <br />
   <br />
   <br />
   <div id="tabs">
-      <a href="index.xqy"><img src="images/byname_selected.gif" width="121" height="30" /></a>
-      <a href="bycountry.xqy"><img src="images/bycountry.gif" width="121" height="30" /></a>
+      <a href="index.xqy"><img src="images/byname.gif" width="121" height="30" /></a>
+      <a href="bycountry.xqy"><img src="images/bycountry_selected.gif" width="121" height="30" /></a>
       <a href="bydate.xqy"><img src="images/bydate.gif" width="121" height="30" /></a>
       <a href="search.xqy"><img src="images/search.gif" width="121" height="30" /></a>
   </div>
-  <div id="graybar"></div>
+  <div id="graybar">
+      <form name="formcountry" method="get" action="bycountry.xqy" id="formcountry">
+          <p>Choose a country: </p>
+          <select name="country" id="country">
+              <option value="all">all</option>
+            {for $leaders in /wl:leader
+               let $country := $leaders/wl:country/text()
+            return if($country = xdmp:get-request-field("country"))
+                    then <option value="{$country}" selected="selected">{$country}</option>
+                else <option value="{$country}">{$country}</option>}
+          </select>
+          <input type="submit" name="submitbtn" id="submitbtn" value="go"/>
+      </form>
+  </div>
   <div id="content">
    <table cellspacing="0">
     <tr>
@@ -41,7 +54,12 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
       <th>Gender</th>
     </tr>
 
-       {for $leader in /wl:leader
+       {let $country := xdmp:get-request-field("country","all")
+       let $leaders :=
+           if($country eq "all")
+           then /wl:leader
+           else /wl:leader[wl:country eq $country]
+       for $leader in $leaders
        let $firstname := $leader/wl:name/wl:firstname/text()
        let $lastname := $leader/wl:name/wl:lastname/text()
        let $country := $leader/wl:country/text()
@@ -55,7 +73,7 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
        let $summary := fn:tokenize(fn:string($leader/wl:summary), " ")[1 to 100]
        let $age := xs:integer(fn:days-from-duration(fn:current-date() -
                xs:date($leader/wl:dob/text())) div 365.25)
-       order by $firstname
+       order by $country, $enddate descending, $lastname
        return(
            <tr>
                <td colspan="10"><hr/></td>

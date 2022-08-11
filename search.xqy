@@ -19,13 +19,20 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
   <br />
   <br />
   <br />
-  <div id="tabs">
-      <a href="index.xqy"><img src="images/byname_selected.gif" width="121" height="30" /></a>
-      <a href="bycountry.xqy"><img src="images/bycountry.gif" width="121" height="30" /></a>
-      <a href="bydate.xqy"><img src="images/bydate.gif" width="121" height="30" /></a>
-      <a href="search.xqy"><img src="images/search.gif" width="121" height="30" /></a>
-  </div>
-  <div id="graybar"></div>
+
+    <div id="tabs">
+        <a href="index.xqy"><img src="images/byname.gif" width="121" height="30" /></a>
+        <a href="bycountry.xqy"><img src="images/bycountry.gif" width="121" height="30" /></a>
+        <a href="bydate.xqy"><img src="images/bydate.gif" width="121" height="30" /></a>
+        <a href="search.xqy"><img src="images/search_selected.gif" width="121" height="30" /></a>
+    </div>
+    <div id="graybar">
+        <form name="formsearch" method="get" action="search.xqy" id="formsearch">
+        <p>Enter a search term: </p>
+        <input type="text" name="term" id="term"  value="{xdmp:get-request-field("term")}"/>
+        <input type="submit" name="submitbtn" id="submitbtn" value="go"/>
+    </form>
+    </div>
   <div id="content">
    <table cellspacing="0">
     <tr>
@@ -41,7 +48,7 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
       <th>Gender</th>
     </tr>
 
-       {for $leader in /wl:leader
+       {for $leader in /wl:leader[cts:contains(., xdmp:get-request-field("term"))]
        let $firstname := $leader/wl:name/wl:firstname/text()
        let $lastname := $leader/wl:name/wl:lastname/text()
        let $country := $leader/wl:country/text()
