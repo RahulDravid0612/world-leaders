@@ -48,7 +48,7 @@ xdmp:set-response-content-type("text/html; charset=utf-8"),
       <th>Gender</th>
     </tr>
 
-       {for $leader in /wl:leader[cts:contains(., xdmp:get-request-field("term"))]
+       {for $leader in /wl:leader[cts:contains(., xdmp:get-request-fie ld("term"))]
        let $firstname := $leader/wl:name/wl:firstname/text()
        let $lastname := $leader/wl:name/wl:lastname/text()
        let $country := $leader/wl:country/text()
